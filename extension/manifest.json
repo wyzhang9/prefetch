@@ -1,7 +1,7 @@
 {
 
   "manifest_version": 2,
-  "name": "Borderify",
+  "name": "Borderify2",
   "version": "1.0",
 
   "description": "TUTORIAL Adds a red border to all webpages matching mozilla.org.",
@@ -12,9 +12,20 @@
 
   "content_scripts": [
     {
-      "matches": ["*://*.mozilla.org/*"],
+      "matches": ["<all_urls>"],
       "js": ["prefetch_extension.js"]
     }
-  ]
-
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "dns",
+    "notifications"
+  ],
+  "applications": {
+    "gecko": {
+      "id": "borderify@example.com"
+    }
+  }
 }
