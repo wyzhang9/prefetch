@@ -1,10 +1,10 @@
 {
 
   "manifest_version": 2,
-  "name": "Borderify2",
+  "name": "Prefetcher",
   "version": "1.0",
 
-  "description": "TUTORIAL Adds a red border to all webpages matching mozilla.org.",
+  "description": "COS561 project",
 
   "icons": {
     "48": "icons/border-48.png"
@@ -25,7 +25,7 @@
   ],
   "applications": {
     "gecko": {
-      "id": "borderify@example.com"
+      "id": "test@example.com"
     }
   }
 }
