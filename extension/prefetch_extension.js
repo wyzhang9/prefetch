@@ -13,22 +13,110 @@ function notifyExtension(e) {
 
     console.log("content script sending message");
     browser.runtime.sendMessage({"url": target.href});
+
+
+    window.location = 'https://mozilla.org/'
+    perf()
 }
+
+
+function perf() {
+    // test accessing timing resources
+    // CODE USED FROM https://github.com/micmro/performance-bookmarklet/blob/master/src/data.js
+    var data = {
+        resources: [],
+        marks: [],
+        measures: [],
+        perfTiming: [],
+        allResourcesCalc: []
+    };
+
+    var isValid = true;
+
+    data.isValid = function () {
+        return isValid;
+    }
+
+    //Check if the browser supports the timing APIs
+    if (window.performance && window.performance.getEntriesByType !== undefined) {
+        data.resources = window.performance.getEntriesByType("resource");
+        data.marks = window.performance.getEntriesByType("mark");
+        data.measures = window.performance.getEntriesByType("measure");
+    } else if (window.performance && window.performance.webkitGetEntriesByType !== undefined) {
+        data.resources = window.performance.webkitGetEntriesByType("resource");
+        data.marks = window.performance.webkitGetEntriesByType("mark");
+        data.measures = window.performance.webkitGetEntriesByType("measure");
+    } else {
+        alert("Oups, looks like this browser does not support the Resource Timing API");
+        isValid = false;
+        return;
+    }
+
+    if (window.performance.timing) {
+        data.perfTiming = window.performance.timing;
+    } else {
+        alert("Oups, looks like this browser does not support performance timing");
+        isValid = false;
+        return;
+    }
+
+    if (data.perfTiming.loadEventEnd - data.perfTiming.navigationStart < 0) {
+        alert("Page is still loading - please try again when page is loaded.");
+        isValid = false;
+        return;
+    }
+
+    console.log(data)
+
+    data.allResourcesCalc = data.resources
+        .map((currR, i, arr) => {
+        //crunch the resources data into something easier to work with
+        const isRequest = currR.name.indexOf("http") === 0;
+    var urlFragments, maybeFileName, fileExtension;
+
+    if (isRequest) {
+        urlFragments = currR.name.match(/:\/\/(.[^/]+)([^?]*)\??(.*)/);
+        maybeFileName = urlFragments[2].split("/").pop();
+        fileExtension = maybeFileName.substr((Math.max(0, maybeFileName.lastIndexOf(".")) || Infinity) + 1);
+    } else {
+        urlFragments = ["", location.host];
+        fileExtension = currR.name.split(":")[0];
+    }
+
+    var currRes = {
+        name: currR.name,
+        domain: urlFragments[1],
+        initiatorType: currR.initiatorType || fileExtension || "SourceMap or Not Defined",
+        fileExtension: fileExtension || "XHR or Not Defined",
+        loadtime: currR.duration,
+        // fileType : helper.getFileType(fileExtension, currR.initiatorType),
+        isRequestToHost: urlFragments[1] === location.host
+    };
+
+    for (var attr in currR) {
+        if (typeof currR[attr] !== "function") {
+            currRes[attr] = currR[attr];
+        }
+    }
+
+    if (currR.requestStart) {
+        currRes.requestStartDelay = currR.requestStart - currR.startTime;
+        currRes.dns = currR.domainLookupEnd - currR.domainLookupStart;
+        currRes.tcp = currR.connectEnd - currR.connectStart;
+        currRes.ttfb = currR.responseStart - currR.startTime;
+        currRes.requestDuration = currR.responseStart - currR.requestStart;
+    }
+    if (currR.secureConnectionStart) {
+        currRes.ssl = currR.connectEnd - currR.secureConnectionStart;
+    }
+
+    // use json.stringify since otherwise console says "unavailable"
+    console.log(JSON.stringify(currRes, null, 4))
+});
+}
+
 
 /*
 Add notifyExtension() as a listener to click events.
 */
 window.addEventListener("click", notifyExtension);
-
-//
-// var myPort = browser.runtime.connect({name:"port-from-cs"});
-// myPort.postMessage({greeting: "hello from content script"});
-//
-// myPort.onMessage.addListener(function(m) {
-//     console.log("In content script, received message from background script: ");
-//     console.log(m.greeting);
-// });
-//
-// document.body.addEventListener("click", function() {
-//     myPort.postMessage({greeting: "they clicked the page!"});
-// });
