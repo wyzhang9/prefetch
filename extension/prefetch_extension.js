@@ -15,12 +15,22 @@ function notifyExtension(e) {
     browser.runtime.sendMessage({"url": target.href});
 
 
-    window.location = 'https://mozilla.org/'
+    //window.location = 'https://mozilla.org/'
+    window = window.open('https://mozilla.org/', '_self')
     perf()
+
 }
 
 
 function perf() {
+    // THIS GETS ALL SAME-HOST URLS ON A PAGE
+    var urls = [];
+    for(var i = document.links.length; i --> 0;)
+        if(document.links[i].hostname === location.hostname)
+            urls.push(document.links[i].href);
+    console.log(JSON.stringify(urls))
+
+
     // test accessing timing resources
     // CODE USED FROM https://github.com/micmro/performance-bookmarklet/blob/master/src/data.js
     var data = {
@@ -111,7 +121,7 @@ function perf() {
     }
 
     // use json.stringify since otherwise console says "unavailable"
-    console.log(JSON.stringify(currRes, null, 4))
+    // console.log(JSON.stringify(currRes, null, 4))
 });
 }
 
