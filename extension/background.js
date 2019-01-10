@@ -15,11 +15,23 @@ function notify(message) {
 
     console.log("urls: " + JSON.stringify(message));
 
-    console.log("trying to resolve urls")
+    console.log("retrieving unique host names");
+    // Retaining only unique hostnames
+    var hostNames = []; // Array of hostnames
     for (var i = 0; i < message.length; i++) {
         var url = new URL(message[i]);
-        console.log("url hostname:" + url.hostname);
-        let resolving = browser.dns.resolve(url.hostname, ["canonical_name"]);
+        hostNames.push(url.hostname);
+    }
+
+    //Retaining only unique host names to resolve
+    var uniqueHostNames = [...new Set(hostNames)]
+
+    console.log("unique host names: " + JSON.stringify(uniqueHostNames));
+
+    console.log("trying to resolve host names")
+    for (var i = 0; i < uniqueHostNames.length; i++) {
+        console.log("url hostname:" + uniqueHostNames[i]);
+        let resolving = browser.dns.resolve(uniqueHostNames[i], ["canonical_name"]);
         resolving.then(resolved);
     }
     console.log("resolving in background")
