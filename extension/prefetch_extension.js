@@ -2,27 +2,16 @@ document.body.style.border = "5px solid blue";
 
 
 function notifyExtension(e) {
-    var target = e.target;
-    while ((target.tagName != "A" || !target.href) && target.parentNode) {
-        target = target.parentNode;
-    }
-    if (target.tagName != "A")
-        return;
-
-    console.log("content script sending message");
-    browser.runtime.sendMessage({"url": target.href});
-
-
     //window.location = 'https://mozilla.org/'
-    window = window.open('https://mozilla.org/', '_self')
+    //window = window.open('https://mozilla.org/', '_self')
 
     var urls = [];
     for(var i = document.links.length; i --> 0;)
-        if(document.links[i].hostname === location.hostname)
+       //  if(document.links[i].hostname === location.hostname)
             urls.push(document.links[i].href);
-    browser.runtime.sendMessage(urls);
+    // browser.runtime.sendMessage(urls);
 
-    //perf()
+    perf()
 
 }
 
@@ -31,7 +20,7 @@ function perf() {
     // THIS GETS ALL SAME-HOST URLS ON A PAGE
     var urls = [];
     for(var i = document.links.length; i --> 0;)
-        if(document.links[i].hostname === location.hostname)
+        // if(document.links[i].hostname === location.hostname)
             urls.push(document.links[i].href);
     console.log(JSON.stringify(urls))
 
@@ -42,7 +31,14 @@ function perf() {
         setTimeout(nothing, 3000)
         site_data[urls[i]] = getPageData(urls[i]);
 
-        console.log("LOAD TIME FOR " + urls[i] + " is " + JSON.stringify(site_data[urls[i]].totalLoadTime));
+        var temp = site_data[urls[i]];
+
+
+        // console.log("total? TIME FOR " + urls[i] + " is " + JSON.stringify(temp.totalLoadTime));
+        // console.log("Performance Data FOR " + urls[i] + " is " + JSON.stringify(temp.perfTiming));
+
+        var pageLoadTime = temp.perfTiming.loadEventEnd - temp.perfTiming.navigationStart;
+        console.log("Page load time FOR " + urls[i] + " is " + JSON.stringify(pageLoadTime));
     }
 
 
@@ -172,7 +168,4 @@ function getPageData(website) {
 /*
 Add notifyExtension() as a listener to click events.
 */
-window.addEventListener("click", notifyExtension);
-
-
-document.body.style.border = "5px solid blue";
+window.addEventListener("load", notifyExtension);
