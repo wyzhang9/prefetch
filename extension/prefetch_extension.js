@@ -1,8 +1,6 @@
 document.body.style.border = "5px solid blue";
 
 
-
-
 function notifyExtension(e) {
     var target = e.target;
     while ((target.tagName != "A" || !target.href) && target.parentNode) {
@@ -30,6 +28,27 @@ function perf() {
             urls.push(document.links[i].href);
     console.log(JSON.stringify(urls))
 
+    site_data = {}
+
+    // LOOP?
+    for (var i = 0; i < urls.length; i++) {
+        setTimeout(nothing, 3000)
+        site_data[urls[i]] = getPageData(urls[i]);
+
+        console.log("LOAD TIME FOR " + urls[i] + " is " + JSON.stringify(site_data[urls[i]].totalLoadTime));
+    }
+
+
+
+    // console.dir(JSON.stringify(site_data, null, 4))
+
+}
+function nothing() {
+
+}
+
+function getPageData(website) {
+    window = window.open(website, '_self')
 
     // test accessing timing resources
     // CODE USED FROM https://github.com/micmro/performance-bookmarklet/blob/master/src/data.js
@@ -76,7 +95,7 @@ function perf() {
         return;
     }
 
-    console.log(data)
+
 
     data.allResourcesCalc = data.resources
         .map((currR, i, arr) => {
@@ -103,6 +122,8 @@ function perf() {
         isRequestToHost: urlFragments[1] === location.host
     };
 
+    // console.log("test l" + currRes["loadtime"]);
+
     for (var attr in currR) {
         if (typeof currR[attr] !== "function") {
             currRes[attr] = currR[attr];
@@ -122,11 +143,29 @@ function perf() {
 
     // use json.stringify since otherwise console says "unavailable"
     // console.log(JSON.stringify(currRes, null, 4))
-});
-}
 
+
+    return currRes;
+});
+
+
+    var allResourcesCalc = data.allResourcesCalc
+    var totalLoadTime = 0;
+    for (var i = 0; i < allResourcesCalc.length; i++) {
+        totalLoadTime += allResourcesCalc[i].duration;
+    }
+
+
+    data.totalLoadTime = totalLoadTime
+
+    return data;
+
+}
 
 /*
 Add notifyExtension() as a listener to click events.
 */
 window.addEventListener("click", notifyExtension);
+
+
+document.body.style.border = "5px solid blue";
