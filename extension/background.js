@@ -1,7 +1,7 @@
 function resolved(record) {
-    // console.log(record.canonicalName);
+    console.log("Resolved Record: ")
+    console.log(record.canonicalName);
     console.log(record.addresses);
-    console.log("here")
 }
 
 
@@ -12,18 +12,17 @@ which we read from the message.
 */
 function notify(message) {
     console.log("background script received message");
-    var title = browser.i18n.getMessage("notificationTitle");
-    var content = browser.i18n.getMessage("notificationContent", message.url);
-    // browser.notifications.create({
-    //     "type": "basic",
-    //     "iconUrl": browser.extension.getURL("icons/link-48.png"),
-    //     "title": title,
-    //     "message": content
-    // });
 
-    console.log("trying to resolve")
-    var resolving = browser.dns.resolve("developer.mozilla.org")// , ["bypass_cache"]);
-    resolving.then(resolved);
+    console.log("urls: " + JSON.stringify(message));
+
+    console.log("trying to resolve urls")
+    for (var i = 0; i < message.length; i++) {
+        var url = new URL(message[i]);
+        console.log("url hostname:" + url.hostname);
+        let resolving = browser.dns.resolve(url.hostname, ["canonical_name"]);
+        resolving.then(resolved);
+    }
+    console.log("resolving in background")
 }
 
 /*

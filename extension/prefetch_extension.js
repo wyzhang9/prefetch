@@ -1,8 +1,6 @@
 document.body.style.border = "5px solid blue";
 
 
-
-
 function notifyExtension(e) {
     var target = e.target;
     while ((target.tagName != "A" || !target.href) && target.parentNode) {
@@ -17,7 +15,14 @@ function notifyExtension(e) {
 
     //window.location = 'https://mozilla.org/'
     window = window.open('https://mozilla.org/', '_self')
-    perf()
+
+    var urls = [];
+    for(var i = document.links.length; i --> 0;)
+        if(document.links[i].hostname === location.hostname)
+            urls.push(document.links[i].href);
+    browser.runtime.sendMessage(urls);
+
+    //perf()
 
 }
 
