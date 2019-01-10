@@ -2,9 +2,6 @@ document.body.style.border = "5px solid blue";
 
 
 function notifyExtension(e) {
-    //window.location = 'https://mozilla.org/'
-    //window = window.open('https://mozilla.org/', '_self')
-
     var urls = [];
     for(var i = document.links.length; i --> 0;)
        //  if(document.links[i].hostname === location.hostname)
@@ -17,22 +14,17 @@ function notifyExtension(e) {
 
 
 function perf() {
-    // THIS GETS ALL SAME-HOST URLS ON A PAGE
     var urls = [];
     for(var i = document.links.length; i --> 0;)
-        // if(document.links[i].hostname === location.hostname)
             urls.push(document.links[i].href);
     console.log(JSON.stringify(urls))
 
     site_data = {}
 
-    // LOOP?
     for (var i = 0; i < urls.length; i++) {
-        setTimeout(nothing, 3000)
         site_data[urls[i]] = getPageData(urls[i]);
 
         var temp = site_data[urls[i]];
-
 
         // console.log("total? TIME FOR " + urls[i] + " is " + JSON.stringify(temp.totalLoadTime));
         // console.log("Performance Data FOR " + urls[i] + " is " + JSON.stringify(temp.perfTiming));
@@ -41,17 +33,22 @@ function perf() {
         console.log("Page load time FOR " + urls[i] + " is " + JSON.stringify(pageLoadTime));
     }
 
-
-
     // console.dir(JSON.stringify(site_data, null, 4))
 
 }
-function nothing() {
 
+function wait(ms){
+    var start = new Date().getTime();
+    var end = start;
+    while(end < start + ms) {
+        end = new Date().getTime();
+    }
 }
 
 function getPageData(website) {
     window = window.open(website, '_self')
+
+    wait(5000)
 
     // test accessing timing resources
     // CODE USED FROM https://github.com/micmro/performance-bookmarklet/blob/master/src/data.js
@@ -98,8 +95,6 @@ function getPageData(website) {
         return;
     }
 
-
-
     data.allResourcesCalc = data.resources
         .map((currR, i, arr) => {
         //crunch the resources data into something easier to work with
@@ -125,8 +120,6 @@ function getPageData(website) {
         isRequestToHost: urlFragments[1] === location.host
     };
 
-    // console.log("test l" + currRes["loadtime"]);
-
     for (var attr in currR) {
         if (typeof currR[attr] !== "function") {
             currRes[attr] = currR[attr];
@@ -145,21 +138,17 @@ function getPageData(website) {
     }
 
     // use json.stringify since otherwise console says "unavailable"
-    // console.log(JSON.stringify(currRes, null, 4))
-
-
     return currRes;
 });
 
-
-    var allResourcesCalc = data.allResourcesCalc
-    var totalLoadTime = 0;
-    for (var i = 0; i < allResourcesCalc.length; i++) {
-        totalLoadTime += allResourcesCalc[i].duration;
-    }
-
-
-    data.totalLoadTime = totalLoadTime
+    // ignore for now
+    // var allResourcesCalc = data.allResourcesCalc
+    // var totalLoadTime = 0;
+    // for (var i = 0; i < allResourcesCalc.length; i++) {
+    //     totalLoadTime += allResourcesCalc[i].duration;
+    // }
+    //
+    // data.totalLoadTime = totalLoadTime
 
     return data;
 
