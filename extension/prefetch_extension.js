@@ -10,7 +10,6 @@ function notifyExtension(e) {
 
 }
 
-
 function perf() {
     console.log("PERF IS BEING CALLED")
     var urls = [];
@@ -22,34 +21,30 @@ function perf() {
     site_data = {}
 
     var i;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < min(10, urls.length); i++) {
         console.log("going for " + i);
         site_data[urls[i]] = getPageData(urls[i]);
     }
 
 }
 
-function wait(ms){
-    var start = new Date().getTime();
-    var end = start;
-    while(end < start + ms) {
-        end = new Date().getTime();
+function min(a, b) {
+    if (a < b) {
+        return a
     }
+    return b
 }
 
 function getPageData(website) {
     console.log("opening")
-
     var temp = window.open(website)
-    //temp.addEventListener("load", getPerfDataOnPage); // 0, since we just want it to defer.
-    console.log("opened and now waiting")
-    // wait(5000)
 }
 
 function getPerfDataOnPage() {
     console.log("HERE");
-    //Check if the browser supports the timing APIs
     console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
+
+    // TODO(bill) log with storage api for comparison with prefetch on/off
 }
 
 /*
@@ -58,7 +53,8 @@ Add notifyExtension() as a listener to click events.
 // window.addEventListener("load", getPerfDataOnPage);
 
 window.addEventListener("load", function() { // IE9+
-    setTimeout(getPerfDataOnPage, 0); // 0, since we just want it to defer.
+    setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
 });
 
+// click triggers the opening and timing of pages linked to by current page.
 window.addEventListener("click", perf)
