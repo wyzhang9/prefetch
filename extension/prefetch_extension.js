@@ -21,7 +21,7 @@ function perf() {
     site_data = {}
 
     var i;
-    for (i = 0; i < min(10, urls.length); i++) {
+    for (i = 0; i < min(2, urls.length); i++) {
         console.log("going for " + i);
         site_data[urls[i]] = getPageData(urls[i]);
     }
@@ -45,7 +45,30 @@ function getPerfDataOnPage() {
     console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
 
     // TODO(bill) log with storage api for comparison with prefetch on/off
+    perfData = window.performance.getEntriesByType("navigation");
+
+    name = perfData[0]["name"]
+    if (name) {
+        var obj = {};
+        obj[name] = JSON.stringify(perfData[0]);
+
+        // Log in local storage, with website name as key
+        // Value is stringified performance timing data.
+        browser.storage.local.set(obj).then(logOkay, onError)
+    } else {
+        console.log("failure, name is " + name)
+    }
+
 }
+
+function logOkay() {
+    console.log("successfully logged a site")
+}
+
+function onError(error) {
+    console.log(JSON.stringify(error))
+}
+
 
 /*
 Add notifyExtension() as a listener to click events.

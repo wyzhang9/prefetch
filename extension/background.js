@@ -25,7 +25,32 @@ function notify(message) {
     console.log("resolving in background")
 }
 
+// Read all data from local storage.
+function summarizePerfData() {
+    console.log("reading from storage")
+
+    // If you pass null, or an undefined value, the entire storage contents will be retrieved.
+    var gettingItem = browser.storage.local.get()
+    gettingItem.then(onGot, onError)
+}
+
+// Called after successfully retrieving local browser storage 
+function onGot(item) {
+    console.log(JSON.stringify(item))
+}
+
+function onError(error) {
+    console.log(JSON.stringify(error))
+}
+
+
 /*
 Assign `notify()` as a listener to messages from the content script.
 */
 browser.runtime.onMessage.addListener(notify);
+
+// browser.runtime.onMessage.addListener(logPerfData);
+
+
+// Adds a listener to when our extension button is clicked.
+browser.browserAction.onClicked.addListener(summarizePerfData);

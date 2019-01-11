@@ -21,11 +21,18 @@
   },
   "permissions": [
     "dns",
-    "notifications"
+    "notifications",
+    "storage"
   ],
   "applications": {
     "gecko": {
       "id": "test@example.com"
+    }
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/page-16.png",
+      "32": "icons/page-32.png"
     }
   }
 }
