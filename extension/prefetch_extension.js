@@ -6,6 +6,7 @@ function notifyExtension(e) {
     var urls = [];
     for(var i = document.links.length; i --> 0;)
         urls.push(document.links[i].href);
+    browser.runtime.sendMessage(urls);
 
     perf()
 
