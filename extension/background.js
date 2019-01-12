@@ -32,9 +32,11 @@ function summarizePerfData() {
     // If you pass null, or an undefined value, the entire storage contents will be retrieved.
     var gettingItem = browser.storage.local.get()
     gettingItem.then(onGot, onError)
+
+    // todo
 }
 
-// Called after successfully retrieving local browser storage 
+// Called after successfully retrieving local browser storage
 function onGot(item) {
     console.log(JSON.stringify(item))
 }

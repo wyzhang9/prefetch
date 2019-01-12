@@ -40,16 +40,24 @@ function getPageData(website) {
     var temp = window.open(website)
 }
 
+// TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
+var PREFETCH_ON = true;
+
+
 function getPerfDataOnPage() {
     console.log("HERE");
     console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
 
-    // TODO(bill) log with storage api for comparison with prefetch on/off
+    //
     perfData = window.performance.getEntriesByType("navigation");
 
     name = perfData[0]["name"]
     if (name) {
         var obj = {};
+        if (PREFETCH_ON) {
+            name = "PREFETCH_ON_" + name;
+        }
+        // maybe average this over multiple runs?
         obj[name] = JSON.stringify(perfData[0]);
 
         // Log in local storage, with website name as key
