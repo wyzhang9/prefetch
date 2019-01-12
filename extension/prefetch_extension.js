@@ -1,5 +1,7 @@
 document.body.style.border = "5px solid blue";
-
+// TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
+var PREFETCH_ON = true;
+var counter = 0;
 
 function notifyExtension(e) {
 
@@ -18,14 +20,15 @@ function perf() {
             urls.push(document.links[i].href);
     console.log(JSON.stringify(urls))
 
-    site_data = {}
-
     var i;
-    for (i = 0; i < min(2, urls.length); i++) {
-        console.log("going for " + i);
-        site_data[urls[i]] = getPageData(urls[i]);
+    var num_trials = 3;
+    for (var i = 0; i < min(2, urls.length); i++) {
+        // repeat each site visit num_trials times
+        for (var j = 0; j < num_trials; j++) {
+            // wait 3000 milliseconds between pages to avoid overlap.
+            setTimeout(getPageData(urls[i]), 3000);
+        }
     }
-
 }
 
 function min(a, b) {
@@ -36,28 +39,30 @@ function min(a, b) {
 }
 
 function getPageData(website) {
-    console.log("opening")
+    console.log("opening " + website)
     var temp = window.open(website)
 }
 
-// TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
-var PREFETCH_ON = true;
-
 
 function getPerfDataOnPage() {
-    console.log("HERE");
-    console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
+    console.log("HERE ");
+    //console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
 
     //
-    perfData = window.performance.getEntriesByType("navigation");
+    var perfData = window.performance.getEntriesByType("navigation");
 
-    name = perfData[0]["name"]
+    var name = perfData[0]["name"]
     if (name) {
         var obj = {};
         if (PREFETCH_ON) {
             name = "PREFETCH_ON_" + name;
         }
+
+        counter++;
+        name = counter + "_" + name
+
         // maybe average this over multiple runs?
+        console.log("logging " + name)
         obj[name] = JSON.stringify(perfData[0]);
 
         // Log in local storage, with website name as key

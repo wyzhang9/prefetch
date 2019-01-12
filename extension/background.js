@@ -45,12 +45,41 @@ function summarizePerfData() {
     var gettingItem = browser.storage.local.get()
     gettingItem.then(onGot, onError)
 
-    // todo
 }
 
 // Called after successfully retrieving local browser storage
 function onGot(item) {
     console.log(JSON.stringify(item))
+
+    // todo Compare the data for PREFETCH_ON_ and without PREFETCH_ON_
+    for (var key in item) {
+        // console.log("KEY IS " + key)
+        if (!key.startsWith("PREFETCH_ON_")) {
+            // console.log("i am here KEY IS " + key)
+            var gettingItem = browser.storage.local.get([key, "PREFETCH_ON_"+key])
+            gettingItem.then(doCompare, onError)
+        }
+    }
+}
+
+// sites just contains PREFETCH_ON_site and site
+function doCompare(sites) {
+    console.log("i am here2")
+
+    //
+    // // get the keys corresponding to PREFETCH_ON_ and off, and compare them
+    var prefetch_on;
+    var prefetch_off;
+    for (var key in sites) {
+        if (key.startsWith("PREFETCH_ON_")) {
+            prefetch_on = sites[key]
+        } else {
+            prefetch_off = sites[key]
+        }
+    }
+
+    console.log("SITEON " + JSON.stringify(prefetch_on ));
+    console.log("SITEOFF " + JSON.stringify(prefetch_off ));
 }
 
 function onError(error) {
