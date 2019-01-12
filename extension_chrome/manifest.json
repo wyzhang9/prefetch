@@ -1,0 +1,21 @@
+ {
+    "name": "prefetch_chrome",
+    "version": "1.0",
+    "description": "COS 561 project for prefetching implementation for chrome.",
+    "icons": {
+      "48": "icons/border-48.png"
+    },
+    "content_scripts":[
+      {
+        "matches:"["<all_urls>"],
+        "js":["prefetch_extension.js"]
+      }
+    ],
+    "background": {
+      "persistent": false,
+      "scripts": ["background_script.js"]
+    },
+    "permissions": [
+      "https://*.google.com/", 
+      "activeTab"],
+  }
