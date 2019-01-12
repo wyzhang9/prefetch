@@ -31,7 +31,7 @@ function notify(message) {
     console.log("trying to resolve host names")
     for (var i = 0; i < uniqueHostNames.length; i++) {
         console.log("url hostname:" + uniqueHostNames[i]);
-        let resolving = browser.dns.resolve(uniqueHostNames[i], ["canonical_name"]);
+        let resolving = chrome.dns.resolve(uniqueHostNames[i], ["canonical_name"]);
         resolving.then(resolved);
     }
     console.log("resolving in background")
@@ -40,4 +40,4 @@ function notify(message) {
 /*
 Assign `notify()` as a listener to messages from the content script.
 */
-browser.runtime.onMessage.addListener(notify);
+chrome.runtime.onMessage.addListener(notify);
