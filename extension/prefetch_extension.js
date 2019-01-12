@@ -2,11 +2,11 @@ document.body.style.border = "5px solid blue";
 
 
 function notifyExtension(e) {
+
     var urls = [];
     for(var i = document.links.length; i --> 0;)
-       //  if(document.links[i].hostname === location.hostname)
-            urls.push(document.links[i].href);
-    // browser.runtime.sendMessage(urls);
+        urls.push(document.links[i].href);
+    browser.runtime.sendMessage(urls);
 
 }
 
