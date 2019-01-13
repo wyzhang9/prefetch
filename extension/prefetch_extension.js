@@ -57,6 +57,8 @@ function handleMapResponse(message){
 
 function perf() {
     console.log("PERF IS BEING CALLED")
+    // todo extend to be able to start on multiple page sources, not just current page
+
     var urls = [];
     for(var i = document.links.length; i --> 0;)
         //if (document.links[i].hostname === location.hostname)
@@ -64,28 +66,35 @@ function perf() {
     console.log(JSON.stringify(urls))
 
     var i;
-    var num_trials = 5;
-    for (var i = 0; i < min(2, urls.length); i++) {
+    var num_trials = 2;
+    for (var i = 0; i < min(5, urls.length); i++) {
         // repeat each site visit num_trials times
-        for (var j = 0; j < num_trials; j++) {
-            // TODO don't forget to space out trials and reset cache between runs
-            var website = urls[i]
-            window.setTimeout(function() {
-                console.log("opening " + website);
-                openPage(website);
+        var rand = i; // Math.floor(Math.random()*urls.length)
+        console.log("rand is " + rand)
 
-                // close the same window after 8 seconds?
-                window.setTimeout(function() {
-                    windows[website].close()
-                    delete(windows[website])
-                }, 8000)
+        // set time out to stagger opening of new URLS
+        window.setTimeout(function(rand) {
+            for (var j = 0; j < num_trials; j++) {
+                var link = urls[rand]
+                // set time out to stagger repeated opening of SAME url
+                window.setTimeout(function(website, j) {
+                    console.log("opening " + website);
+                    openPage(website, j);
 
-            }, Math.floor(Math.random() * 50000));
-        }
+                    // set time out to close the same window after 8 seconds?
+                    window.setTimeout(function(j) {
+                        windows[website + j].close()
+                        delete(windows[website + j])
+                    }, 8000, j)
+
+                }, Math.floor(Math.random() * 5000), link, j);
+            }
+
+        }, Math.floor(Math.random() * 15000), rand)
     }
 
     // close all remaining windows.
-    window.setTimeout(closeAllWindows(windows), 70000)
+    window.setTimeout(closeAllWindows(windows), 12000)
 }
 
 function closeAllWindows(windows) {
@@ -103,10 +112,10 @@ function min(a, b) {
     return b
 }
 
-function openPage(website) {
-    console.log("opening " + website)
+function openPage(website, j) {
+    console.log("opening " + j + " " + website)
     var temp = window.open(website)
-    windows[website] = temp
+    windows[website + j] = temp
 }
 
 
