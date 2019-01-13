@@ -7,27 +7,23 @@ var windows = {}
 function notifyExtension(e) {
 
     console.log("notify extension");
-    // dns prefetching here...
+
     var urls = [];
     for(var i = document.links.length; i --> 0;)
         urls.push(document.links[i].href);
-    // browser.runtime.sendMessage(urls);
 
-    console.log("First preemptive fetch");
-    console.log("num urls: " + urls.length);
+    console.log("Pre-emptive prefetching + DNS resolution");
     var i;
-    for (i = 0; i < min(30, urls.length); i++) {
+    for (i = 0; i < min(5, urls.length); i++) {
         console.log("prefetch - opening: " + i);
         var sending = browser.runtime.sendMessage({
             url: urls[i], 
             func: "notify",
-            numUrlOnPage: urls.length
+            numUrlOnPage: min(5, urls.length)
         });
 
         sending.then(handleMapResponse, handleError); 
     }
-
-
 }
 
 function handleError(error){
@@ -35,15 +31,19 @@ function handleError(error){
 }
 
 function handleMapResponse(message){
-    console.log("url: " + message.thisUrl);
-    console.log("num url seen: " + message.numSitesSeen);
-    console.log("num url on page: " + message.numUrlonPage);
-    if (message.numSitesSeen < 15) {
-        if(message.count > 2) {
-            console.log("seen twice already, do not reopen");
-        } else {
-            console.log("seen: " + message.count);
-            var temp = window.open(message.thisUrl);
+    if (message.currDepth >= 1) {
+        console.log("depth past initial")
+    } else {
+        console.log("url: " + message.thisUrl);
+        console.log("num url seen: " + message.numSitesSeen);
+        console.log("num url on page: " + message.numUrlonPage);
+        if (message.numSitesSeen < 10) {
+            if(message.count > 2) {
+                console.log("seen twice already, do not reopen");
+            } else {
+                console.log("seen: " + message.count);
+                var temp = window.open(message.thisUrl);
+            }
         }
     }
 }

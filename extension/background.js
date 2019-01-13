@@ -8,7 +8,8 @@ function resolved(record) {
 // Sites visited so far + number of times visited..
 var visitedSites = {}
 var visitedSiteSize = 0;
-
+var hostNames = []
+var depth = 0;
 /*
 Log that we received the message.
 Then display a notification. The notification contains the URL,
@@ -17,59 +18,42 @@ which we read from the message.
 function notify(message, sender, sendResponse) {
     console.log("background script received message");
 
-    // currently emssage is just a single url/html link..
-    //var obj = JSON.parse(message);
+    var currUrl = message.url;
 
-    console.log("message: " + JSON.stringify(message));
+    if (message.numUrlOnPage != visitedSiteSize && depth == 0) {
+        console.log("message: " + JSON.stringify(message));
 
-    if (message.func === "notify") {
-        console.log("continue in notify");
-    }
+        if (message.func === "notify") {
+            console.log("continue in notify");
+        }
 
-    var url = message.url;
+        console.log("DNS resolution");
+        var urlObj = new URL(message.url);
+        if (!(urlObj.hostname in hostNames)) {
+            hostNames.push(urlObj.hostname);
+            browser.dns.resolve(urlObj.hostname, ["canonical_name"]);
+        }
 
-    var tabId = browser.tabs.getCurrent();
-
-    console.log("adding to the hashmap");
-    if (url in visitedSites) {
-        visitedSites[url] = visitedSites[url] + 1;
+        console.log("Adding to the hashmap");
+        if (currUrl in visitedSites) {
+            console.log("currURL: " + currUrl);
+            visitedSites[currUrl] = visitedSites[currUrl] + 1;
+        } else {
+            visitedSites[currUrl] = 1;
+            visitedSiteSize++;
+        }
+        console.log("visitedSiteSize: " + visitedSiteSize);
     } else {
-        visitedSites[url] = 1;
-        visitedSiteSize++;
+        depth++;
     }
-
-    console.log("visitedSites: " + JSON.stringify(visitedSites));
-    console.log("visitedSiteSize: " + visitedSiteSize)
     sendResponse({
-        count:visitedSites[url], 
-        thisUrl: url,
+        count:visitedSites[currUrl], 
+        thisUrl: currUrl,
         numSitesSeen: visitedSiteSize,
-        numUrlonPage: message.numUrlOnPage
+        numUrlonPage: message.numUrlOnPage,
+        currDepth: depth
     });
-
-    //console.log("urls: " + JSON.stringify(message));
-
-    // console.log("retrieving unique host names");
-    // // Retaining only unique hostnames
-    // var hostNames = []; // Array of hostnames
-    // for (var i = 0; i < message.length; i++) {
-    //     var url = new URL(message[i]);
-    //     hostNames.push(url.hostname);
-    // }
-
-    // //Retaining only unique host names to resolve
-    // var uniqueHostNames = [...new Set(hostNames)]
-
-    // console.log("unique host names: " + JSON.stringify(uniqueHostNames));
-
-    // console.log("trying to resolve host names")
-    // for (var i = 0; i < uniqueHostNames.length; i++) {
-    //     console.log("url hostname:" + uniqueHostNames[i]);
-    //     let resolving = browser.dns.resolve(uniqueHostNames[i], ["canonical_name"]);
-    //     resolving.then(resolved);
-    // }
-    // console.log("resolving in background")
-
+       
 }
 
 // Read all data from local storage.
