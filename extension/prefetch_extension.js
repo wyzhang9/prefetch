@@ -1,7 +1,7 @@
 document.body.style.border = "5px solid blue";
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
 var PREFETCH_ON = false;
-var windows = []
+var windows = {}
 
 function notifyExtension(e) {
 
@@ -25,22 +25,31 @@ function perf() {
     for (var i = 0; i < min(2, urls.length); i++) {
         // repeat each site visit num_trials times
         for (var j = 0; j < num_trials; j++) {
-            // wait 3000 milliseconds between pages to avoid overlap.
             // TODO don't forget to space out trials and reset cache between runs
             var website = urls[i]
             window.setTimeout(function() {
                 console.log("opening " + website);
                 openPage(website);
-            }, Math.floor(Math.random() * 15000));
+
+                // close the same window after 8 seconds?
+                window.setTimeout(function() {
+                    windows[website].close()
+                    delete(windows[website])
+                }, 8000)
+
+            }, Math.floor(Math.random() * 100000));
         }
     }
 
-    window.setTimeout(closeAllWindows(windows), 30000)
+    // close all remaining windows.
+    window.setTimeout(closeAllWindows(windows), 120000)
 }
 
 function closeAllWindows(windows) {
-    for (var i = 0; i < windows.length; i++) {
-        windows[i].close()
+    for (var key in windows) {
+        if (windows.hasOwnProperty(key)) {
+            windows[key].close()
+        }
     }
 }
 
@@ -54,7 +63,7 @@ function min(a, b) {
 function openPage(website) {
     console.log("opening " + website)
     var temp = window.open(website)
-    windows.push(temp)
+    windows[website] = temp
 }
 
 
