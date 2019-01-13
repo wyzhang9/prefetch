@@ -1,7 +1,7 @@
 document.body.style.border = "5px solid blue";
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
-var PREFETCH_ON = false;
-var windows = {}
+var PREFETCH_ON = true;
+var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN
 
 function notifyExtension(e) {
 
@@ -21,7 +21,7 @@ function perf() {
     console.log(JSON.stringify(urls))
 
     var i;
-    var num_trials = 3;
+    var num_trials = 5;
     for (var i = 0; i < min(2, urls.length); i++) {
         // repeat each site visit num_trials times
         for (var j = 0; j < num_trials; j++) {
@@ -37,7 +37,7 @@ function perf() {
                     delete(windows[website])
                 }, 8000)
 
-            }, Math.floor(Math.random() * 100000));
+            }, Math.floor(Math.random() * 50000));
         }
     }
 
