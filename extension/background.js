@@ -138,7 +138,7 @@ function getAverageLoadTime(data, key, count) {
         if (index in data) {
             var temp = JSON.parse(data[index]);
             var end = parseInt(temp["loadEventEnd"])
-            var start = parseInt(temp["loadEventStart"])
+            var start = parseInt(temp["redirectStart"])
             sum += end - start;
         }
     }
