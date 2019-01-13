@@ -21,6 +21,7 @@
   },
   "permissions": [
     "dns",
+    "tabs",
     "notifications",
     "storage"
   ],
