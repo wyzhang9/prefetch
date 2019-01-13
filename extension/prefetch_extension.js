@@ -1,7 +1,6 @@
 document.body.style.border = "5px solid blue";
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
 var PREFETCH_ON = true;
-var counter = 0;
 
 function notifyExtension(e) {
 
@@ -21,12 +20,13 @@ function perf() {
     console.log(JSON.stringify(urls))
 
     var i;
-    var num_trials = 3;
+    var num_trials = 5;
     for (var i = 0; i < min(2, urls.length); i++) {
         // repeat each site visit num_trials times
         for (var j = 0; j < num_trials; j++) {
             // wait 3000 milliseconds between pages to avoid overlap.
-            setTimeout(getPageData(urls[i]), 3000);
+            // TODO don't forget to space out trials and reset cache between runs
+            setTimeout(openPage(urls[i]), 8000);
         }
     }
 }
@@ -38,7 +38,7 @@ function min(a, b) {
     return b
 }
 
-function getPageData(website) {
+function openPage(website) {
     console.log("opening " + website)
     var temp = window.open(website)
 }
@@ -55,11 +55,10 @@ function getPerfDataOnPage() {
     if (name) {
         var obj = {};
         if (PREFETCH_ON) {
-            name = "PREFETCH_ON_" + name;
+            name = "PREFETCHON_" + name;
         }
 
-        counter++;
-        name = counter + "_" + name
+        name = Math.random() + "_" + name
 
         // maybe average this over multiple runs?
         console.log("logging " + name)
@@ -72,10 +71,15 @@ function getPerfDataOnPage() {
         console.log("failure, name is " + name)
     }
 
+
+    // todo see if the right window is being closed, or just the current one
+    // had to comment this out since window was closing before successful logging
+    // window.close()
 }
 
 function logOkay() {
     console.log("successfully logged a site")
+    // window.close()
 }
 
 function onError(error) {
