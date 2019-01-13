@@ -1,5 +1,9 @@
 document.body.style.border = "5px solid blue";
 
+// TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
+var PREFETCH_ON = false;
+var windows = {}
+
 function notifyExtension(e) {
 
     console.log("notify extension");
@@ -52,14 +56,37 @@ function perf() {
             urls.push(document.links[i].href);
     console.log(JSON.stringify(urls))
 
-    site_data = {}
-
     var i;
-    for (i = 0; i < min(2, urls.length); i++) {
-        console.log("going for " + i);
-        site_data[urls[i]] = getPageData(urls[i]);
+    var num_trials = 3;
+    for (var i = 0; i < min(2, urls.length); i++) {
+        // repeat each site visit num_trials times
+        for (var j = 0; j < num_trials; j++) {
+            // TODO don't forget to space out trials and reset cache between runs
+            var website = urls[i]
+            window.setTimeout(function() {
+                console.log("opening " + website);
+                openPage(website);
+
+                // close the same window after 8 seconds?
+                window.setTimeout(function() {
+                    windows[website].close()
+                    delete(windows[website])
+                }, 8000)
+
+            }, Math.floor(Math.random() * 100000));
+        }
     }
 
+    // close all remaining windows.
+    window.setTimeout(closeAllWindows(windows), 120000)
+}
+
+function closeAllWindows(windows) {
+    for (var key in windows) {
+        if (windows.hasOwnProperty(key)) {
+            windows[key].close()
+        }
+    }
 }
 
 function min(a, b) {
@@ -69,21 +96,31 @@ function min(a, b) {
     return b
 }
 
-function getPageData(website) {
-    console.log("opening")
+function openPage(website) {
+    console.log("opening " + website)
     var temp = window.open(website)
+    windows[website] = temp
 }
 
+
 function getPerfDataOnPage() {
-    console.log("HERE");
-    console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
+    console.log("HERE ");
+    //console.log(JSON.stringify(window.performance.getEntriesByType("navigation")));
 
-    // TODO(bill) log with storage api for comparison with prefetch on/off
-    perfData = window.performance.getEntriesByType("navigation");
+    //
+    var perfData = window.performance.getEntriesByType("navigation");
 
-    name = perfData[0]["name"]
+    var name = perfData[0]["name"]
     if (name) {
         var obj = {};
+        if (PREFETCH_ON) {
+            name = "PREFETCHON_" + name;
+        }
+
+        name = Math.random() + "_" + name
+
+        // maybe average this over multiple runs?
+        console.log("logging " + name)
         obj[name] = JSON.stringify(perfData[0]);
 
         // Log in local storage, with website name as key
@@ -93,10 +130,19 @@ function getPerfDataOnPage() {
         console.log("failure, name is " + name)
     }
 
+
+    // todo see if the right window is being closed, or just the current one
+    // had to comment this out since window was closing before successful logging
+    // window.close()
 }
 
 function logOkay() {
     console.log("successfully logged a site")
+    window.setTimeout(delayedClose, 5000);
+}
+
+function delayedClose() {
+    window.close();
 }
 
 function onError(error) {
@@ -113,5 +159,5 @@ window.addEventListener("load", notifyExtension);
 //     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
 // });
 
-// // click triggers the opening and timing of pages linked to by current page.
-// window.addEventListener("click", perf)
+// click triggers the opening and timing of pages linked to by current page.
+window.addEventListener("dblclick", perf)
