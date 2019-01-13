@@ -1,6 +1,13 @@
 document.body.style.border = "5px solid blue";
 
 
+// If we have completed loading the document, then 
+// we want to basically "refetch" it again...
+if (document.readyState == "complete") {
+    console.log("page has completed loading + opening again...")
+    window.open(window.location.href);
+}
+
 function notifyExtension(e) {
 
     var urls = [];
@@ -70,10 +77,35 @@ function onError(error) {
 }
 
 
+function prefetchLinks() {
+    console.log("prefetching links attempt?")
+
+    var urls = [];
+    for(var i = document.links.length; i --> 0;)
+         urls.push(document.links[i].href);
+    
+    console.log(JSON.stringify(urls))
+
+    site_data = {}
+
+    console.log("First preemptive fetch");
+    var i;
+    for (i = 0; i < min(2, urls.length); i++) {
+        console.log("prefetch - opening: " + i);
+        var temp = window.open(urls[i]);
+    }
+
+}
+
 /*
 Add notifyExtension() as a listener to click events.
 */
-// window.addEventListener("load", getPerfDataOnPage);
+
+window.addEventListener("load", notifyExtension);
+
+window.addEventListener("load", function() {
+    setTimeout(prefetchLinks, 5000);
+})
 
 window.addEventListener("load", function() { // IE9+
     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
