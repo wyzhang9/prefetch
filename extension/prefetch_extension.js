@@ -3,6 +3,7 @@ document.body.style.border = "5px solid blue";
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
 var PREFETCH_ON = false;
 var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN
+var prefetchWindows = {}
 
 function notifyExtension(e) {
 
@@ -43,6 +44,12 @@ function handleMapResponse(message){
             } else {
                 console.log("seen: " + message.count);
                 var temp = window.open(message.thisUrl);
+                prefetchWindows[message.thisUrl] = temp
+
+                window.setTimeout(function() {
+                    prefetchWindows[message.thisUrl].close()
+                    delete(prefetchWindows[message.thisUrl])
+                }, 8000)
             }
         }
     }
