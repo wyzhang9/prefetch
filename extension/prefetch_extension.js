@@ -1,15 +1,51 @@
 document.body.style.border = "5px solid blue";
+
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
 var PREFETCH_ON = true;
 var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN
 
 function notifyExtension(e) {
 
+    console.log("notify extension");
+    // dns prefetching here...
     var urls = [];
     for(var i = document.links.length; i --> 0;)
         urls.push(document.links[i].href);
-    browser.runtime.sendMessage(urls);
+    // browser.runtime.sendMessage(urls);
 
+    console.log("First preemptive fetch");
+    console.log("num urls: " + urls.length);
+    var i;
+    for (i = 0; i < min(30, urls.length); i++) {
+        console.log("prefetch - opening: " + i);
+        var sending = browser.runtime.sendMessage({
+            url: urls[i], 
+            func: "notify",
+            numUrlOnPage: urls.length
+        });
+
+        sending.then(handleMapResponse, handleError); 
+    }
+
+
+}
+
+function handleError(error){
+    console.log("Error: " + JSON.strigify(error));
+}
+
+function handleMapResponse(message){
+    console.log("url: " + message.thisUrl);
+    console.log("num url seen: " + message.numSitesSeen);
+    console.log("num url on page: " + message.numUrlonPage);
+    if (message.numSitesSeen < 15) {
+        if(message.count > 2) {
+            console.log("seen twice already, do not reopen");
+        } else {
+            console.log("seen: " + message.count);
+            var temp = window.open(message.thisUrl);
+        }
+    }
 }
 
 function perf() {
@@ -113,15 +149,15 @@ function onError(error) {
     console.log(JSON.stringify(error))
 }
 
-
 /*
 Add notifyExtension() as a listener to click events.
 */
-// window.addEventListener("load", getPerfDataOnPage);
 
-window.addEventListener("load", function() { // IE9+
-    setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
-});
+window.addEventListener("load", notifyExtension);
+
+// window.addEventListener("load", function() { // IE9+
+//     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
+// });
 
 // click triggers the opening and timing of pages linked to by current page.
 window.addEventListener("dblclick", perf)
