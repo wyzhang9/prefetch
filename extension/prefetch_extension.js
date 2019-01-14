@@ -2,7 +2,7 @@ document.body.style.border = "5px solid blue";
 
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
 var PREFETCH_ON = false;
-var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN
+var windows = {}
 var prefetchWindows = {}
 
 function notifyExtension(e) {
