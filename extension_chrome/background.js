@@ -61,7 +61,7 @@ function summarizePerfData() {
     console.log("reading from storage")
 
     // If you pass null, or an undefined value, the entire storage contents will be retrieved.
-    var gettingItem = chrome.storage.local.get()
+    var gettingItem = chrome.storage.local.get(null)
     gettingItem.then(onGot, onError)
 
 }

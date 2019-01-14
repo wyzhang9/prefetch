@@ -167,7 +167,7 @@ function onError(error) {
 Add notifyExtension() as a listener to click events.
 */
 
-window.addEventListener("load", notifyExtension);
+//window.addEventListener("load", notifyExtension);
 
 window.addEventListener("load", function() { // IE9+
     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
