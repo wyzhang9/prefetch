@@ -114,7 +114,7 @@ function onGot(item) {
             var prefetch_on_inter = getAverageLoadTime(data,
                 "PREFETCHON_"+key, counts["PREFETCHON_"+key], "domInteractive", "unloadEventStart")
 
-            console.log("prefetch on, time for " + key + " load on average is " + prefetch_on_inter)
+            console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_on_inter)
             console.log("prefetch off, time on average is " + prefetch_off_inter)
         }
     }

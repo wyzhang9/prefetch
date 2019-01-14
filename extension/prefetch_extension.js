@@ -66,8 +66,8 @@ function perf() {
     console.log(JSON.stringify(urls))
 
     var i;
-    var num_trials = 2;
-    for (var i = 0; i < min(5, urls.length); i++) {
+    var num_trials = 10;
+    for (var i = 0; i < min(3, urls.length); i++) {
         // repeat each site visit num_trials times
         var rand = i; // Math.floor(Math.random()*urls.length)
         console.log("rand is " + rand)
@@ -87,14 +87,14 @@ function perf() {
                         delete(windows[website + j])
                     }, 8000, j)
 
-                }, Math.floor(Math.random() * 5000), link, j);
+                }, Math.floor(Math.random() * 60000), link, j);
             }
 
         }, Math.floor(Math.random() * 15000), rand)
     }
 
     // close all remaining windows.
-    window.setTimeout(closeAllWindows(windows), 12000)
+    window.setTimeout(closeAllWindows(windows), 70000)
 }
 
 function closeAllWindows(windows) {
