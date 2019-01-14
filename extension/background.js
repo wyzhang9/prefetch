@@ -6,10 +6,9 @@ function resolved(record) {
 
 
 // Sites visited so far + number of times visited..
-var visitedSites = {}
-var visitedSiteSize = 0;
+var visitedSites = []
 var hostNames = []
-var depth = 0;
+var seenBefore;
 /*
 Log that we received the message.
 Then display a notification. The notification contains the URL,
@@ -19,8 +18,14 @@ function notify(message, sender, sendResponse) {
     console.log("background script received message");
 
     var currUrl = message.url;
+    var originUrl = message.originUrl;
 
-    if (message.numUrlOnPage != visitedSiteSize && depth == 0) {
+    console.log("visitedSites: " + JSON.stringify(visitedSites));
+
+    // only proceed if origin url has not been seen before
+    if (visitedSites.indexOf(originUrl) == -1 && 
+        visitedSites.indexOf(currUrl) == -1) {
+        seenBefore = false;
         console.log("message: " + JSON.stringify(message));
 
         if (message.func === "notify") {
@@ -34,24 +39,15 @@ function notify(message, sender, sendResponse) {
             browser.dns.resolve(urlObj.hostname, ["canonical_name"]);
         }
 
-        console.log("Adding to the hashmap");
-        if (currUrl in visitedSites) {
-            console.log("currURL: " + currUrl);
-            visitedSites[currUrl] = visitedSites[currUrl] + 1;
-        } else {
-            visitedSites[currUrl] = 1;
-            visitedSiteSize++;
-        }
-        console.log("visitedSiteSize: " + visitedSiteSize);
+        console.log("Adding to the array");
+        visitedSites.push(currUrl);
+        console.log("visitedSiteSize: " + visitedSites.length);
     } else {
-        depth++;
+        seenBefore = true;
     }
-    sendResponse({
-        count:visitedSites[currUrl], 
+    sendResponse({ 
         thisUrl: currUrl,
-        numSitesSeen: visitedSiteSize,
-        numUrlonPage: message.numUrlOnPage,
-        currDepth: depth
+        seen: seenBefore
     });
        
 }
