@@ -101,18 +101,28 @@ function onGot(item) {
 
         var key = arr_sites[i]
         if (!key.startsWith("PREFETCHON_")) {
-            var prefetch_off_time = getAverageLoadTime(data, key, counts[key])
-            var prefetch_on_time = getAverageLoadTime(data, "PREFETCHON_"+key, counts["PREFETCHON_"+key])
+            var prefetch_off_time = getAverageLoadTime(data,
+                key, counts[key], "loadEventEnd", "unloadEventStart")
+            var prefetch_on_time = getAverageLoadTime(data,
+                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "loadEventEnd", "unloadEventStart")
 
-            console.log("prefetch on, time for " + key + " on average is " + prefetch_on_time)
+            console.log("prefetch on, time for " + key + " load on average is " + prefetch_on_time)
             console.log("prefetch off, time on average is " + prefetch_off_time)
+
+            var prefetch_off_inter = getAverageLoadTime(data,
+                key, counts[key], "domInteractive", "unloadEventStart")
+            var prefetch_on_inter = getAverageLoadTime(data,
+                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "domInteractive", "unloadEventStart")
+
+            console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_on_inter)
+            console.log("prefetch off, time on average is " + prefetch_off_inter)
         }
     }
 }
 
 // Given a set of data, a key to compare, averages the [count] occurrences
 // of key's load time
-function getAverageLoadTime(data, key, count) {
+function getAverageLoadTime(data, key, count, endField, startField) {
     var sum = 0;
 
     for (var i = 1; i <= count; i++) {
@@ -121,8 +131,8 @@ function getAverageLoadTime(data, key, count) {
         //console.log("attempting to parse?  " + index )
         if (index in data) {
             var temp = JSON.parse(data[index]);
-            var end = parseInt(temp["loadEventEnd"])
-            var start = parseInt(temp["redirectStart"])
+            var end = parseInt(temp[endField])
+            var start = parseInt(temp[startField])
             sum += end - start;
         }
     }

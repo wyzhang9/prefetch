@@ -162,9 +162,9 @@ Add notifyExtension() as a listener to click events.
 
 window.addEventListener("load", notifyExtension);
 
-// window.addEventListener("load", function() { // IE9+
-//     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
-// });
+window.addEventListener("load", function() { // IE9+
+    setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
+});
 
-// // click triggers the opening and timing of pages linked to by current page.
-// window.addEventListener("dblclick", perf)
+// click triggers the opening and timing of pages linked to by current page.
+window.addEventListener("dblclick", perf)
