@@ -10,6 +10,7 @@ var visitedSites = {}
 var visitedSiteSize = 0;
 var hostNames = []
 var depth = 0;
+
 /*
 Log that we received the message.
 Then display a notification. The notification contains the URL,
@@ -47,13 +48,13 @@ function notify(message, sender, sendResponse) {
         depth++;
     }
     sendResponse({
-        count:visitedSites[currUrl], 
+        count: visitedSites[currUrl],
         thisUrl: currUrl,
         numSitesSeen: visitedSiteSize,
         numUrlonPage: message.numUrlOnPage,
         currDepth: depth
     });
-       
+
 }
 
 // Read all data from local storage.
@@ -61,8 +62,8 @@ function summarizePerfData() {
     console.log("reading from storage")
 
     // If you pass null, or an undefined value, the entire storage contents will be retrieved.
-    var gettingItem = chrome.storage.local.get(null)
-    gettingItem.then(onGot, onError)
+    var gettingItem = chrome.storage.local.get(null, onGot)
+    //gettingItem.then(onGot, onError)
 
 }
 
@@ -100,23 +101,17 @@ function onGot(item) {
     for (var i = 0; i < arr_sites.length; i++) {
 
         var key = arr_sites[i]
-        if (!key.startsWith("PREFETCHON_")) {
-            var prefetch_off_time = getAverageLoadTime(data,
-                key, counts[key], "loadEventEnd", "unloadEventStart")
-            var prefetch_on_time = getAverageLoadTime(data,
-                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "loadEventEnd", "unloadEventStart")
 
-            console.log("prefetch on, time for " + key + " load on average is " + prefetch_on_time)
-            console.log("prefetch off, time on average is " + prefetch_off_time)
+        var prefetch_time = getAverageLoadTime(data,
+            key, counts[key], "loadEventEnd", "unloadEventStart")
 
-            var prefetch_off_inter = getAverageLoadTime(data,
-                key, counts[key], "domInteractive", "unloadEventStart")
-            var prefetch_on_inter = getAverageLoadTime(data,
-                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "domInteractive", "unloadEventStart")
+        console.log("prefetch on, time for " + key + " load on average is " + prefetch_time)
 
-            console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_on_inter)
-            console.log("prefetch off, time on average is " + prefetch_off_inter)
-        }
+        var prefetch_inter = getAverageLoadTime(data,
+            key, counts[key], "domInteractive", "unloadEventStart")
+
+        console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_inter)
+
     }
 }
 
@@ -126,7 +121,7 @@ function getAverageLoadTime(data, key, count, endField, startField) {
     var sum = 0;
 
     for (var i = 1; i <= count; i++) {
-        var index = key+"_"+count;
+        var index = key + "_" + i;
 
         //console.log("attempting to parse?  " + index )
         if (index in data) {
@@ -136,8 +131,8 @@ function getAverageLoadTime(data, key, count, endField, startField) {
             sum += end - start;
         }
     }
-    console.log("sum is " + sum + " avg is " + (sum/count))
-    return sum/count;
+    console.log("sum is " + sum + " avg is " + (sum / count))
+    return sum / count;
 }
 
 function onError(error) {
@@ -149,8 +144,8 @@ function onError(error) {
 Assign `notify()` as a listener to messages from the content script.
 */
 chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        if(request.func === "notify") {
+    function (request, sender, sendResponse) {
+        if (request.func === "notify") {
             notify(request, sender, sendResponse)
             return true;
         }

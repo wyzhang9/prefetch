@@ -122,7 +122,7 @@ function getAverageLoadTime(data, key, count, endField, startField) {
     var sum = 0;
 
     for (var i = 1; i <= count; i++) {
-        var index = key+"_"+count;
+        var index = key+"_"+i;
 
         //console.log("attempting to parse?  " + index )
         if (index in data) {
