@@ -1,8 +1,8 @@
 document.body.style.border = "5px solid blue";
 
 // TOGGLE THIS TO SAVE DATA WHEN PREFETCH IS ON OR OFF
-var PREFETCH_ON = false;
-var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN
+var PREFETCH_ON = true;
+var windows = {} // ALLISON, THIS VARIABLE IS MINE, GO MAKE YOUR OWN <3
 var prefetchWindows = {}
 
 function notifyExtension(e) {
@@ -169,9 +169,9 @@ Add notifyExtension() as a listener to click events.
 
 window.addEventListener("load", notifyExtension);
 
-// window.addEventListener("load", function() { // IE9+
-//     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
-// });
+window.addEventListener("load", function() { // IE9+
+    setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
+});
 
-// // click triggers the opening and timing of pages linked to by current page.
-// window.addEventListener("dblclick", perf)
+// click triggers the opening and timing of pages linked to by current page.
+window.addEventListener("dblclick", perf)
