@@ -15,12 +15,12 @@ function notifyExtension(e) {
 
     console.log("Pre-emptive prefetching + DNS resolution");
     var i;
-    for (i = 0; i < min(5, urls.length); i++) {
+    for (i = 0; i < min(2, urls.length); i++) {
         console.log("prefetch - opening: " + i);
         var sending = browser.runtime.sendMessage({
+            originUrl: window.location.href,
             url: urls[i], 
             func: "notify",
-            numUrlOnPage: min(5, urls.length)
         });
 
         sending.then(handleMapResponse, handleError); 
@@ -32,26 +32,17 @@ function handleError(error){
 }
 
 function handleMapResponse(message){
-    if (message.currDepth >= 1) {
-        console.log("depth past initial")
+    if (message.seen == true) {
+        console.log("do not open, is either sub page or has been opened")
     } else {
         console.log("url: " + message.thisUrl);
-        console.log("num url seen: " + message.numSitesSeen);
-        console.log("num url on page: " + message.numUrlonPage);
-        if (message.numSitesSeen < 10) {
-            if(message.count > 1) {
-                console.log("seen twice already, do not reopen");
-            } else {
-                console.log("seen: " + message.count);
-                var temp = window.open(message.thisUrl);
-                prefetchWindows[message.thisUrl] = temp
+        var temp = window.open(message.thisUrl);
+        prefetchWindows[message.thisUrl] = temp
 
-                window.setTimeout(function() {
-                    prefetchWindows[message.thisUrl].close()
-                    delete(prefetchWindows[message.thisUrl])
-                }, 8000)
-            }
-        }
+        window.setTimeout(function() {
+            prefetchWindows[message.thisUrl].close()
+            delete(prefetchWindows[message.thisUrl])
+        }, 8000)
     }
 }
 
@@ -169,11 +160,11 @@ function onError(error) {
 Add notifyExtension() as a listener to click events.
 */
 
-// window.addEventListener("load", notifyExtension);
+window.addEventListener("load", notifyExtension);
 
-window.addEventListener("load", function() { // IE9+
-    setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
-});
+// window.addEventListener("load", function() { // IE9+
+//     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
+// });
 
-// click triggers the opening and timing of pages linked to by current page.
-window.addEventListener("dblclick", perf)
+// // click triggers the opening and timing of pages linked to by current page.
+// window.addEventListener("dblclick", perf)
