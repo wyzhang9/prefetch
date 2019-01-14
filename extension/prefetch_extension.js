@@ -27,7 +27,7 @@ function notifyExtension(e) {
 }
 
 function handleError(error){
-    console.log("Error: " + JSON.strigify(error));
+    console.log("Error: " + JSON.stringify(error));
 }
 
 function handleMapResponse(message){
@@ -38,7 +38,7 @@ function handleMapResponse(message){
         console.log("num url seen: " + message.numSitesSeen);
         console.log("num url on page: " + message.numUrlonPage);
         if (message.numSitesSeen < 10) {
-            if(message.count > 2) {
+            if(message.count > 1) {
                 console.log("seen twice already, do not reopen");
             } else {
                 console.log("seen: " + message.count);
