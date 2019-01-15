@@ -25,12 +25,17 @@ function notify(message, sender, sendResponse) {
     // only proceed if origin url has not been seen before
     if (visitedSites.indexOf(originUrl) == -1 && 
         visitedSites.indexOf(currUrl) == -1) {
-        seenBefore = false;
+        var seenBefore = false;
         console.log("message: " + JSON.stringify(message));
 
         if (message.func === "notify") {
             console.log("continue in notify");
         }
+
+        sendResponse({
+            thisUrl: currUrl,
+            seen: seenBefore
+        });
 
         console.log("DNS resolution");
         var urlObj = new URL(message.url);
@@ -44,12 +49,12 @@ function notify(message, sender, sendResponse) {
         console.log("visitedSiteSize: " + visitedSites.length);
     } else {
         seenBefore = true;
+
+        sendResponse({
+            thisUrl: currUrl,
+            seen: seenBefore
+        });
     }
-    sendResponse({ 
-        thisUrl: currUrl,
-        seen: seenBefore
-    });
-       
 }
 
 // Read all data from local storage.
@@ -94,25 +99,17 @@ function onGot(item) {
     console.log("Now comparing before and after")
     var arr_sites = Array.from(sites)
     for (var i = 0; i < arr_sites.length; i++) {
-
         var key = arr_sites[i]
-        if (!key.startsWith("PREFETCHON_")) {
-            var prefetch_off_time = getAverageLoadTime(data,
-                key, counts[key], "loadEventEnd", "unloadEventStart")
-            var prefetch_on_time = getAverageLoadTime(data,
-                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "loadEventEnd", "unloadEventStart")
 
-            console.log("prefetch on, time for " + key + " load on average is " + prefetch_on_time)
-            console.log("prefetch off, time on average is " + prefetch_off_time)
+        var prefetch_time = getAverageLoadTime(data,
+            key, counts[key], "loadEventEnd", "unloadEventStart")
 
-            var prefetch_off_inter = getAverageLoadTime(data,
-                key, counts[key], "domInteractive", "unloadEventStart")
-            var prefetch_on_inter = getAverageLoadTime(data,
-                "PREFETCHON_"+key, counts["PREFETCHON_"+key], "domInteractive", "unloadEventStart")
+        console.log("prefetch on, time for " + key + " load on average is " + prefetch_time)
 
-            console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_on_inter)
-            console.log("prefetch off, time on average is " + prefetch_off_inter)
-        }
+        var prefetch_inter = getAverageLoadTime(data,
+            key, counts[key], "domInteractive", "unloadEventStart")
+
+        console.log("prefetch on, time for " + key + " domInt on average is " + prefetch_inter)
     }
 }
 
@@ -122,7 +119,7 @@ function getAverageLoadTime(data, key, count, endField, startField) {
     var sum = 0;
 
     for (var i = 1; i <= count; i++) {
-        var index = key+"_"+i;
+        var index = key + "_" + i;
 
         //console.log("attempting to parse?  " + index )
         if (index in data) {
@@ -132,8 +129,8 @@ function getAverageLoadTime(data, key, count, endField, startField) {
             sum += end - start;
         }
     }
-    console.log("sum is " + sum + " avg is " + (sum/count))
-    return sum/count;
+    console.log("sum is " + sum + " avg is " + (sum / count))
+    return sum / count;
 }
 
 function onError(error) {

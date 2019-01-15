@@ -136,11 +136,6 @@ function getPerfDataOnPage() {
     } else {
         console.log("failure, name is " + name)
     }
-
-
-    // todo see if the right window is being closed, or just the current one
-    // had to comment this out since window was closing before successful logging
-    // window.close()
 }
 
 function logOkay() {
@@ -160,7 +155,7 @@ function onError(error) {
 Add notifyExtension() as a listener to click events.
 */
 
-window.addEventListener("load", notifyExtension);
+// window.addEventListener("load", notifyExtension);
 
 window.addEventListener("load", function() { // IE9+
     setTimeout(getPerfDataOnPage, 5000); // 0, since we just want it to defer.
